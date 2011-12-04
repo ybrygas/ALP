@@ -1,0 +1,7 @@
+0.7
+-  (alp-reporter): Merge alp-reporter-db , alp-reporter-client into alp-reporter  
+-  (alp-reporter): Add e-mail notification  TestNG Listener
+-  (alp-selenium): Automatically catch and add to log JavaScript Errors (currently support only firefox)
+-  (alp-flexpilot): Implement ALP wrapper for Flex Pilot (https://github.com/mde/flex-pilot/wiki)
+-  (alp-utils): Add JSON Validator 
+
