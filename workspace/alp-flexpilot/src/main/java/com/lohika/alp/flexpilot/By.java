@@ -173,8 +173,8 @@ public abstract class By {
 	  public static class ByChain extends By {
 	    private final String chainExpression;
 
-	    public ByChain(String xpathExpression) {
-	      this.chainExpression = xpathExpression;
+	    public ByChain(String in_Expression) {
+	      this.chainExpression = in_Expression;
 	    }
 
 	    @Override

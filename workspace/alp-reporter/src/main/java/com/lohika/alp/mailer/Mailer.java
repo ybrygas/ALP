@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -34,6 +33,7 @@ import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -43,8 +43,8 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
+import org.testng.TestNG;
 
-import com.beust.testng.TestNG;
 import com.lohika.alp.reporter.HTMLLogTransformer;
 import com.lohika.alp.utils.zip.Zip;
 
@@ -87,66 +87,70 @@ public class Mailer implements ISuiteListener {
 
 	public void onFinish(ISuite suite) {
 
-		if (mailerConfigurator.getAutoMail()!=null && mailerConfigurator.getAutoMail()
-				&& session!=null) {
+		if (session!=null&& mailerConfigurator.getAutoMail()) {
 			String html = null;
 			try {
 				transformXml(new File(TestNG.DEFAULT_OUTPUTDIR).getAbsolutePath());
-			} catch (Exception e) {
-				logger.error("Log transformation for email failure", e);
-			}
-			try {
 				html = new String(Zip.readFileAsBytes(htmlFile.getAbsolutePath()), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.error("Unable to read email from file", e);
-				return;
+			} catch (IOException e1) {
+				logger.error("Log transformation for email failure", e1);
+				e1.printStackTrace();
+			} catch (TransformerException e1) {
+				logger.error("Log transformation for email failure", e1);
+				e1.printStackTrace();
 			}
-
+			
 			List<String> recipients = mailerConfigurator.getRecipients();
 			List<String> suiteRecipients = mailerConfigurator.getSuiteRecipients();
 			if (recipients!=null || suiteRecipients!=null) {
-				Message msg = new MimeMessage(session);
+				Message msg = new MimeMessage(session);		        
+					try {
+						msg.setFrom(new InternetAddress(mailerConfigurator.getSender()));
+						if (recipients != null)
+							for (String recipient: recipients)
+								msg.addRecipient(Message.RecipientType.TO, 
+				                    new InternetAddress(recipient));
+							if (suiteRecipients != null)
+							for (String recipient: suiteRecipients)
+								msg.addRecipient(Message.RecipientType.TO, 
+				                    new InternetAddress(recipient));
+							msg.setSubject("ALP Suite Mailer: "+suite.getName());
+							msg.setHeader("Content-Type", "text/html; charset=utf-8");
 
-		        try {
-					msg.setFrom(new InternetAddress(mailerConfigurator.getSender()));
-					if (recipients != null)
-					for (String recipient: recipients)
-						msg.addRecipient(Message.RecipientType.TO, 
-		                    new InternetAddress(recipient));
-					if (suiteRecipients != null)
-					for (String recipient: suiteRecipients)
-						msg.addRecipient(Message.RecipientType.TO, 
-		                    new InternetAddress(recipient));
-					msg.setSubject("ALP Suite Mailer: "+suite.getName());
-					msg.setHeader("Content-Type", "text/html; charset=utf-8");
+				            // HTMLDataSource is an inner class
+					        MimeBodyPart messageBodyPart = new MimeBodyPart();
+					        HTMLDataSource ds = new HTMLDataSource(html);
+					        messageBodyPart.setDataHandler(new DataHandler(ds));
+							messageBodyPart.setHeader("Content-Type", "text/html; charset=utf-8");
 
-		            // HTMLDataSource is an inner class
-			        MimeBodyPart messageBodyPart = new MimeBodyPart();
-			        HTMLDataSource ds = new HTMLDataSource(html);
-			        messageBodyPart.setDataHandler(new DataHandler(ds));
-					messageBodyPart.setHeader("Content-Type", "text/html; charset=utf-8");
+					        Multipart multipart = new MimeMultipart();
+					        multipart.addBodyPart(messageBodyPart);
+					        
+					        // Generate zip file with all logs and data
+							String dir = new File(TestNG.DEFAULT_OUTPUTDIR).getAbsolutePath();
+							
+							Zip zip = new Zip(dir+File.separatorChar+"mail-logs.zip");
+							zip.add(dir+File.separatorChar+"results.html");
+							zip.add(dir+File.separatorChar+"logs-data");
+							zip.add(dir+File.separatorChar+"logs-html");
+							zip.close();
+					        
+					        File fileAttachment = new File(zip.getZipFileLocation());
+					        attachFile(fileAttachment, suite.getName()+".zip", multipart);
 
-			        Multipart multipart = new MimeMultipart();
-			        multipart.addBodyPart(messageBodyPart);
-			        
-			        // Generate zip file with all logs and data
-					String dir = new File(TestNG.DEFAULT_OUTPUTDIR).getAbsolutePath();
-					
-					Zip zip = new Zip(dir+File.separatorChar+"mail-logs.zip");
-					zip.add(dir+File.separatorChar+"results.html");
-					zip.add(dir+File.separatorChar+"logs-data");
-					zip.add(dir+File.separatorChar+"logs-html");
-					zip.close();
-			        
-			        File fileAttachment = new File(zip.getZipFile());
-			        attachFile(fileAttachment, suite.getName()+".zip", multipart);
+					        msg.setContent(multipart);
 
-			        msg.setContent(multipart);
-
-					Transport.send(msg);
-				} catch (Exception e) {
-					logger.warn(new MailerException("Unable to sent email to "+mailerConfigurator.getRecipients()+": "+e.getMessage()), e.getCause());
-				}
+							Transport.send(msg);
+					} catch (AddressException e) {
+						logger.warn(new MailerException("Unable to sent email to "+mailerConfigurator.getRecipients()+": "+e.getMessage()), e.getCause());
+						e.printStackTrace();						
+					} catch (MessagingException e) {
+						logger.warn(new MailerException("Unable to sent email to "+mailerConfigurator.getRecipients()+": "+e.getMessage()), e.getCause());
+						e.printStackTrace();
+					} catch (IOException e) {
+						logger.warn(new MailerException("Unable to sent email to "+mailerConfigurator.getRecipients()+": "+e.getMessage()), e.getCause());
+						e.printStackTrace();
+					}	
 			}
 		}
 	}

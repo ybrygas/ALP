@@ -29,20 +29,31 @@ import com.lohika.alp.selenium.jscatcher.JsErrorCatcherConfiguration;
 public class FirefoxDriverConfigurator implements IWebDriverConfigurator {
 
 	public DesiredCapabilities configure(DesiredCapabilities capabilities) {
-		
-		if (JsErrorCatcherConfiguration.getInstance().getAllowDomains() == null)
+
+        String[] domains = JsErrorCatcherConfiguration.getInstance().getAllowDomains();
+
+		if (domains == null)
 			return capabilities;
 
-		FirefoxProfile profile = new FirefoxProfile();
+
+
+		FirefoxProfile profile;
+
+        profile= (FirefoxProfile)capabilities.getCapability(FirefoxDriver.PROFILE);
+
+        if(profile==null) profile = new FirefoxProfile();
+
 		// enable access to XPCComponents
 		profile.setPreference("signed.applets.codebase_principal_support", true);
 		int i=0;
-		for (String host: JsErrorCatcherConfiguration.getInstance().getAllowDomains()) {
+		for (String host: domains) {
 			profile.setPreference("capability.principal.codebase.p"+i+".granted", "UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite UniversalPreferencesRead UniversalPreferencesWrite UniversalFileRead");
 			profile.setPreference("capability.principal.codebase.p"+i+".id", host);
 			i++;
 		}
+
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+
 		return capabilities;
 	}
 

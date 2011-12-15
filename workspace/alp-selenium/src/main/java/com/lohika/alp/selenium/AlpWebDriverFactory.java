@@ -34,14 +34,14 @@ import com.lohika.alp.selenium.log.LoggingWebDriverListener;
 
 public class AlpWebDriverFactory {
 
-	public static WebDriver getDriver(String url,
+	public static WebDriver getDriver(String SeleniumUrl,
 			DesiredCapabilities capabilities) throws MalformedURLException {
 
 		Logger alpSeleniumLogger = Logger.getLogger("com.lohika.alp.selenium");
 		if (alpSeleniumLogger.getLevel() == null)
 			alpSeleniumLogger.setLevel(Level.DEBUG);
 
-		URL remoteAddress = new URL(url);
+		URL remoteAddress = new URL(SeleniumUrl);
 
 		CommandExecutor commandExecutor = new HttpCommandExecutor(remoteAddress);
 
@@ -53,6 +53,8 @@ public class AlpWebDriverFactory {
 		// Configure capabilities for webdriver to use js error catcher (only FF support now)
 		WebDriverConfigurator webDriverConfigurator = new WebDriverConfigurator(name);
 		capabilities = webDriverConfigurator.configure(capabilities);
+
+
 		
 		// Create remote WebDriver instance
 		driver = new RemoteWebDriverTakeScreenshotFix(commandExecutor,

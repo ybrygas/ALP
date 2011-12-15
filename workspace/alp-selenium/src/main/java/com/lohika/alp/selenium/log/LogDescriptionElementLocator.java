@@ -15,6 +15,7 @@
 package com.lohika.alp.selenium.log;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -53,5 +54,26 @@ public class LogDescriptionElementLocator implements ElementLocator {
 
 		return element;
 	}
+
+
+
+    @Override
+    public List<WebElement> findElements() {
+        List<WebElement> elements;
+        try {
+            elements = locator.findElements();
+        } catch (NoSuchElementException e) {
+
+            throw new com.lohika.alp.selenium.NoSuchElementException(descr, e);
+        }
+
+        for (WebElement element: elements)
+        if (element instanceof DescribedElement) {
+
+            ((DescribedElement) element).setDescription(descr);
+        }
+
+        return elements;
+    }
 
 }

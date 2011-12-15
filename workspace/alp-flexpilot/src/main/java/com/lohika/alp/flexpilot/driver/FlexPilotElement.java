@@ -37,8 +37,7 @@ import com.lohika.alp.flexpilot.pagefactory.FlexPilotFactory;
 import com.lohika.alp.selenium.log.DescribedElement;
 import com.lohika.alp.selenium.log.LogDescriptionBean;
 
-public class FlexPilotElement implements FlexElement, DescribedElement, Locatable,
-WrapsElement, FindsById, FindsByName, FindsByLinkText, FindsByChain {
+public class FlexPilotElement implements FlexElement, DescribedElement, WrapsElement {
 	
 	protected final Logger logger = Logger.getLogger(getClass());
 
@@ -83,62 +82,12 @@ WrapsElement, FindsById, FindsByName, FindsByLinkText, FindsByChain {
 		return description;
 	}
 
-	public Coordinates getCoordinates() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Point getLocationOnScreenOnceScrolledIntoView() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public FlexElement findElement(By by) {
 		return by.findElement(this);
 	}
 
 	public List<FlexElement> findElements(By by) {
 		return by.findElements(this);
-	}
-
-	public FlexElement findElementByChain(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<FlexElement> findElementsByChain(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FlexElement findElementByName(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<FlexElement> findElementsByName(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FlexElement findElementById(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<FlexElement> findElementsById(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FlexElement findElementByLinkText(String using) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<FlexElement> findElementsByLinkText(String using) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public void click() {

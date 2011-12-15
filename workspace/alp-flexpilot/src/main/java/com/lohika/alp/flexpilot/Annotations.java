@@ -37,22 +37,14 @@ public class Annotations {
 	    By ans = null;
 
 	    FindBys findBys = field.getAnnotation(FindBys.class);
-	    if (ans == null && findBys != null) {
-	      ans = buildByFromFindBys(findBys);
-	    }
+	    if ( findBys != null) ans = buildByFromFindBys(findBys);	    
 
 	    FindBy findBy = field.getAnnotation(FindBy.class);
-	    if (ans == null && findBy != null) {
-	      ans = buildByFromFindBy(findBy);
-	    }
+	    if (ans == null && findBy != null) ans = buildByFromFindBy(findBy);	    
 
-	    if (ans == null) {
-	      ans = buildByFromDefault();
-	    }
+	    if (ans == null) ans = buildByFromDefault();
 
-	    if (ans == null) {
-	      throw new IllegalArgumentException("Cannot determine how to locate element " + field);
-	    }
+	    if (ans == null) throw new IllegalArgumentException("Cannot determine how to locate element " + field);
 
 	    return ans;
 	  }

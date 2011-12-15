@@ -40,35 +40,35 @@ public class FirefoxJsErrorCathcer implements JSErrorCatcher {
 		if (JsErrorCatcherConfiguration.getInstance().getAllowDomains()==null)
 			throw new JsErrorCatcherException("Unable to get JS errors. Need to provide allowed domains in the config file");
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-		String script = "netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite UniversalPreferencesRead UniversalPreferencesWrite UniversalFileRead');";
-		script += "var consoleService = Components.classes[\"@mozilla.org/consoleservice;1\"].getService(Components.interfaces.nsIConsoleService);";
-		script += "var errors = {};";
-		script += "var count = {};";
-		script += "consoleService.getMessageArray(errors, count);";
-		script += "var r = [];";
-		script += "for (var i=0; i<errors.value.length; i++) {";
-		script += "msg = errors.value[i];";
-		script += "if (msg instanceof Components.interfaces.nsIScriptError) {";
-		script += "msg.QueryInterface(Components.interfaces.nsIScriptError);";
-		script += "if (msg.category=='HUDConsole'";
-		script += " || msg.category=='content javascript'";
-		script += " || msg.category=='CSS Parser'";
-		script += " || msg.category=='CSS Loader'";
-		script += " || msg.category=='DOM Events'";
-		script += " || msg.category=='DOM:HTML'";
-		script += " || msg.category=='DOM Window'";
-		script += " || msg.category=='SVG'";
-		script += " || msg.category=='ImageMap'";
-		script += " || msg.category=='HTML'";
-		script += " || msg.category=='Canvas'";
-		script += " || msg.category=='DOM3 Load'";
-		script += " || msg.category=='DOM'";
-		script += " || msg.category=='malformed-xml'";
-		script += " || msg.category=='DOM Worker javascript')";
-		script += "r.push(msg.message);";
-		script += "}};";
-		script += "consoleService.reset();";
-		script += "return r;";
+		String script = "netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite UniversalPreferencesRead UniversalPreferencesWrite UniversalFileRead');"
+		+"var consoleService = Components.classes[\"@mozilla.org/consoleservice;1\"].getService(Components.interfaces.nsIConsoleService);"
+		+ "var errors = {};"
+		+ "var count = {};"
+		+ "consoleService.getMessageArray(errors, count);"
+		+ "var r = [];"
+		+ "for (var i=0; i<errors.value.length; i++) {"
+		+ "msg = errors.value[i];"
+		+ "if (msg instanceof Components.interfaces.nsIScriptError) {"
+		+ "msg.QueryInterface(Components.interfaces.nsIScriptError);"
+		+ "if (msg.category=='HUDConsole'"
+		+ " || msg.category=='content javascript'"
+		+ " || msg.category=='CSS Parser'"
+		+ " || msg.category=='CSS Loader'"
+		+ " || msg.category=='DOM Events'"
+		+ " || msg.category=='DOM:HTML'"
+		+ " || msg.category=='DOM Window'"
+		+ " || msg.category=='SVG'"
+		+ " || msg.category=='ImageMap'"
+		+ " || msg.category=='HTML'"
+		+ " || msg.category=='Canvas'"
+		+ " || msg.category=='DOM3 Load'"
+		+ " || msg.category=='DOM'"
+		+ " || msg.category=='malformed-xml'"
+		+ " || msg.category=='DOM Worker javascript')"
+		+ "r.push(msg.message);"
+		+ "}};"
+		+ "consoleService.reset();"
+		+ "return r;";
 		
 		return((ArrayList<String>)js.executeScript(script));
 	}

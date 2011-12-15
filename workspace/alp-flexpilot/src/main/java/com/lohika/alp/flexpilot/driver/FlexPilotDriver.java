@@ -31,12 +31,10 @@ import com.lohika.alp.flexpilot.FindsByChain;
 import com.lohika.alp.flexpilot.FindsByLinkText;
 import com.lohika.alp.flexpilot.FindsByName;
 import com.lohika.alp.flexpilot.FlexElement;
-import com.lohika.alp.flexpilot.SearchContext;
 import com.lohika.alp.flexpilot.pagefactory.FlexPilotFactory;
 import com.lohika.alp.flexpilot.pagefactory.FlexPilotFactoryJAXB;
 
-public class FlexPilotDriver implements FlexDriver, SearchContext,
-FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
+public class FlexPilotDriver implements FlexDriver,FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
 	
 	private Logger log = Logger.getLogger(getClass());
 
@@ -53,7 +51,7 @@ FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
 	protected Object doCommand(String command, Object... args) {
 		String params = arrayToString(args,",");
 		log.debug("COMMAND:"+command+" {"+params+"}");
-		Object res = null;
+		Object res;
 		try {
 			res = ((JavascriptExecutor) driver).executeScript("return document.getElementsByName('" +
 				flashObjectName + "')[0]." +
@@ -71,9 +69,10 @@ FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
 		ArrayList<Object> args = new ArrayList<Object>();
 		
 		for(Map.Entry<String, ?> e : parameters.entrySet()) {
-			StringBuffer item = new StringBuffer();
-			
-			if ("id".equals(e.getKey()) || "opt".equals(e.getKey()))
+			StringBuilder item;
+            item = new StringBuilder();
+
+            if ("id".equals(e.getKey()) || "opt".equals(e.getKey()))
 				item.append(e.getValue().toString());
 			else {
 				item.append("'");
@@ -106,6 +105,11 @@ FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
 		return by.findElement(this);
 	}
 
+    /**
+     * This method is not currently implemented
+     * @param by The locating mechanism to use
+     * @return null
+     */
 	public List<FlexElement> findElements(By by) {
 		return by.findElements(this);
 	}
@@ -134,29 +138,7 @@ FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
 	
 	/** TODO: implement searching elements **/
 	protected List<FlexElement> findElements(String by, String using) {
-		if (using == null) {
-			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
-		}
-		List<FlexElement> elements = new ArrayList<FlexElement>();
-		return elements;
-	}
-	  
-	protected FlexElement findElement(String xpath, String rootobj, String maxdepth) {
-		if (xpath == null) {
-			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
-		}
-		FlexPilotElement el = new FlexPilotElement(this, factory);
-		el.setId(getId(xpath, rootobj, maxdepth));
-		return el;
-	}
-
-	/** TODO: implement searching elements **/
-	protected List<FlexElement> findElements(String xpath, String rootobj, String maxdepth) {
-		if (xpath == null) {
-			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
-		}
-		List<FlexElement> elements = new ArrayList<FlexElement>();
-		return elements;
+		return null;
 	}
 	  
 	public FlexElement findElementById(String using) {
@@ -189,14 +171,6 @@ FindsById, FindsByName, FindsByLinkText, FindsByChain, TakesScreenshot {
 
 	public List<FlexElement> findElementsByLinkText(String using) {
 		return findElements("link", using);
-	}
-
-	public FlexElement findElementByXPath(String xpathExpression, String rootobj, String maxdepth) {
-		return findElement(xpathExpression, rootobj, maxdepth);
-	}
-
-	public List<FlexElement> findElementsByXPath(String xpathExpression, String rootobj, String maxdepth) {
-		return findElements(xpathExpression, rootobj, maxdepth);
 	}
 
 	public String getVersion() {
